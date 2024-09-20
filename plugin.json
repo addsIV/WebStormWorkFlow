@@ -1,0 +1,11 @@
+{
+  "ID": "WebstormWorkFlow",
+  "ActionKeyword": "ws",
+  "Name": "Open With WebStorm",
+  "Description": "Open frontend projects with WebStorm",
+  "Author": "Kevin lin",
+  "Version": "1.0.0",
+  "Language": "csharp",
+  "IcoPath": "Images\\icon.png",
+  "ExecuteFileName": "WebstormWorkFlow.dll"
+}
