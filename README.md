@@ -8,3 +8,6 @@ To start using thins plugin, there are 3 steps you need to do first
 2. close flow launcher if it's running
 3. build this plugin
 4. open flow launcher and you should able to use `ws` to activate the plugin
+
+![image](https://github.com/user-attachments/assets/e5a3b4e7-de47-41e3-954f-9ee2f7496197)
+
