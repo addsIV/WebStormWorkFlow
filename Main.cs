@@ -44,6 +44,7 @@ public class Main : IPlugin
 
     private void LoadProjects()
     {
+        // change to your target projects directory
         const string projectsDirectory = @"D:\projects";
         _projects = new Dictionary<string, string>();
 
@@ -56,6 +57,7 @@ public class Main : IPlugin
 
     private void OpenProject(string path)
     {
+        // change to the path of your webstorm executable file
         const string webstormExecutable = @"C:\Users\kevin.lin93\AppData\Local\Programs\oh-my-posh\bin\webstorm.cmd";
         Process.Start(new ProcessStartInfo
         {
