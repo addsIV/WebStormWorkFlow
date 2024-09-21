@@ -1,19 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using Flow.Launcher.Plugin;
+using WebStormWorkFlow.Models;
 
 namespace WebStormWorkFlow;
 
 public class Main : IPlugin
 {
-    private PluginInitContext _context;
-    private Dictionary<string, string> _projects;
+    private PluginInitContext? _context;
+    private Dictionary<string, string>? _projects;
+    private Config? _config;
 
     public void Init(PluginInitContext context)
     {
         _context = context;
-        LoadProjects();
+        _context.API.LogInfo("WebStormWorkFlow", "Plugin initialization started.");
+        
+        LoadConfig(); 
+        _context.API.LogInfo("WebStormWorkFlow", "Configuration loaded successfully.");
+        
+        LoadProjects();  
+        _context.API.LogInfo("WebStormWorkFlow", "Projects loaded successfully.");
     }
 
     public List<Result> Query(Query query)
@@ -21,7 +30,7 @@ public class Main : IPlugin
         var results = new List<Result>();
         var keyword = query.Search;
 
-        foreach (var project in _projects)
+        foreach (var project in _projects!)
         {
             if (project.Key.ToLower().Contains(keyword.ToLower()))
             {
@@ -30,7 +39,7 @@ public class Main : IPlugin
                     Title = project.Key,
                     SubTitle = $"Open {project.Key} with WebStorm",
                     IcoPath = "Images\\icon.png",
-                    Action = e =>
+                    Action = _ =>
                     {
                         OpenProject(project.Value);
                         return true;
@@ -41,14 +50,28 @@ public class Main : IPlugin
 
         return results;
     }
+    
+    private void LoadConfig()
+    {
+        var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var configFilePath = Path.Combine(appDataPath, "FlowLauncher", "Plugins", "WebstormWorkFlow", "config.json");
+       
+        if (File.Exists(configFilePath))
+        {
+            var configJson = File.ReadAllText(configFilePath);
+            _config = JsonSerializer.Deserialize<Config>(configJson)!;
+        }
+        else
+        {
+            throw new FileNotFoundException("WebstormWorkFlow: Configuration file not found.");
+        }
+    }
 
     private void LoadProjects()
     {
-        // change to your target projects directory
-        const string projectsDirectory = @"D:\projects";
         _projects = new Dictionary<string, string>();
 
-        foreach (var dir in Directory.GetDirectories(projectsDirectory))
+        foreach (var dir in Directory.GetDirectories(_config!.ProjectsDirectory))
         {
             var dirName = Path.GetFileName(dir);
             _projects[dirName] = dir;
@@ -57,11 +80,9 @@ public class Main : IPlugin
 
     private void OpenProject(string path)
     {
-        // change to the path of your webstorm executable file
-        const string webstormExecutable = @"C:\Users\kevin.lin93\AppData\Local\Programs\oh-my-posh\bin\webstorm.cmd";
         Process.Start(new ProcessStartInfo
         {
-            FileName = webstormExecutable,
+            FileName = _config!.WebstormExecutable,
             Arguments = $"\"{path}\"",
             UseShellExecute = true
         });
